@@ -1,0 +1,86 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": false
+  },
+  "files": {
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/coverage",
+      "!**/.turbo",
+      "!apps/docs/.next",
+      "!apps/docs/.source",
+      "!apps/docs/out",
+      "!apps/docs/next-env.d.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "quoteProperties": "asNeeded"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    },
+    "parser": {
+      "allowComments": true
+    }
+  },
+  "assist": {
+    "enabled": false
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noDoubleEquals": "error",
+        "noExplicitAny": "off",
+        "noConsole": "error"
+      },
+      "style": {
+        "noInferrableTypes": "error",
+        "useThrowOnlyError": "error",
+        "noNonNullAssertion": "off"
+      },
+      "nursery": {
+        "useExplicitType": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/tests/**", "**/.dev/**", "apps/docs/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          },
+          "nursery": {
+            "useExplicitType": "off"
+          }
+        }
+      }
+    }
+  ]
+}

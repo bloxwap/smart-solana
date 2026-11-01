@@ -1,0 +1,67 @@
+{
+  "name": "@bloxwap/smart-solana",
+  "version": "0.1.0",
+  "description": "Adaptive, rate-limit-aware Solana JSON-RPC transport for @solana/kit and @solana/web3.js.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "keywords": [
+    "solana",
+    "rpc",
+    "solana-kit",
+    "web3.js",
+    "load-balancer",
+    "failover",
+    "typescript"
+  ],
+  "homepage": "https://github.com/bloxwap/smart-solana#readme",
+  "bugs": {
+    "url": "https://github.com/bloxwap/smart-solana/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bloxwap/smart-solana.git",
+    "directory": "packages/smart-solana"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "default": "./dist/registry.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json",
+    "test": "bun test tests/",
+    "test:live": "LIVE_RPC=1 bun test tests/live.test.ts",
+    "bench:live": "bun run build && node --experimental-strip-types .dev/bench/live.ts",
+    "bench:sustained": "bun run build && node --experimental-strip-types .dev/bench/sustained.ts",
+    "build": "tsc --project tsconfig.build.json",
+    "prepublishOnly": "bun run typecheck && bun run test && bun run build"
+  },
+  "devDependencies": {
+    "@solana/kit": "8.6.0",
+    "@solana/web3.js": "^3.1.1",
+    "@types/bun": "1.4.3",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
