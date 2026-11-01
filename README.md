@@ -28,6 +28,8 @@ A sustained 15-second comparison used ten concurrent `getSlot` workers against t
 | **`smartSolana()` uncached** |      682 |  **0** | **45.47 req/s** | **116.07 ms** | **140.00 ms** |
 | PublicNode direct            |      664 |      0 |     44.27 req/s |     121.12 ms |     152.46 ms |
 
+A separate rate-limit scenario ran ten concurrent `getSlot` workers against the official Solana RPC and then Smart Solana. The official endpoint returned 40 successes followed by 521 consecutive HTTP 429 responses, while Smart Solana completed **682/682 requests with zero errors** at a 108.13 ms p50 and 164.62 ms p95. Reproduce it with `bun run bench:failover`.
+
 Live public-provider measurements vary by network and time. See the [benchmark methodology and reproduction commands](https://bloxwap.github.io/smart-solana/docs/benchmarks/).
 
 ## Installation

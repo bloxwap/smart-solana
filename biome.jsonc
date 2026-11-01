@@ -9,6 +9,7 @@
       "!**/node_modules",
       "!**/dist",
       "!**/coverage",
+      "!**/*-results.json",
       "!**/.turbo",
       "!apps/docs/.next",
       "!apps/docs/.source",

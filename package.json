@@ -24,7 +24,8 @@
     "docs:build": "cd apps/docs && bun run build",
     "docs:check": "cd apps/docs && bun run check",
     "bench:live": "cd packages/smart-solana && bun run bench:live",
-    "bench:sustained": "cd packages/smart-solana && bun run bench:sustained"
+    "bench:sustained": "cd packages/smart-solana && bun run bench:sustained",
+    "bench:failover": "cd packages/smart-solana && bun run bench:failover"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.4",

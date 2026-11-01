@@ -51,6 +51,7 @@
     "test:live": "LIVE_RPC=1 bun test tests/live.test.ts",
     "bench:live": "bun run build && node --experimental-strip-types .dev/bench/live.ts",
     "bench:sustained": "bun run build && node --experimental-strip-types .dev/bench/sustained.ts",
+    "bench:failover": "bun run build && BENCH_CONCURRENCY_LEVELS=10 BENCH_STAGE_MS=15000 BENCH_OUT=failover-results.json node --experimental-strip-types .dev/bench/sustained.ts",
     "build": "tsc --project tsconfig.build.json",
     "prepublishOnly": "bun run typecheck && bun run test && bun run build"
   },

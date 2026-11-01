@@ -17,3 +17,4 @@ benchmark-results.json
 sustained-results.json
 sustained-registry-results.json
 sustained-optimized-results.json
+failover-results.json

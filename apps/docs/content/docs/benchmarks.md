@@ -19,7 +19,26 @@ The optimized transport was compared with a direct PublicNode connection using t
 
 The earlier router reached a 383.77 ms p50 and 2,994.63 ms p95 under the same workload. Removing speculative in-flight penalties, keeping unknown providers off the healthy user path, and disabling PublicNode HTTP batching removed that overhead.
 
-## Reproduce
+## Rate-limit failover
+
+This read-only edge case uses ten concurrent `getSlot` workers for 15 seconds against the official Solana RPC and then Smart Solana. No errors are injected and no transactions are sent. The pool uses one retry with cache, coalescing, hedging, and health probes disabled.
+
+| Transport                  |  Successful | HTTP 429 | Failure rate |           p50 |           p95 |
+| -------------------------- | ----------: | -------: | -----------: | ------------: | ------------: |
+| Official Solana RPC direct |      40/561 |      521 |    **92.8%** |     163.55 ms |     250.96 ms |
+| `smartSolana()` uncached   | **682/682** |    **0** |       **0%** | **108.13 ms** | **164.62 ms** |
+
+The official endpoint returned its first 40 successes during the initial second, then returned only HTTP 429 responses for the remaining 521 attempts. Its latency columns primarily measure error responses. Smart Solana routed the same sustained workload through healthy providers without a failed user request.
+
+Run it from the repository root:
+
+```sh
+bun run bench:failover
+```
+
+The full per-second report is written to `packages/smart-solana/failover-results.json`.
+
+## Reproduce the PublicNode latency comparison
 
 From the repository root:
 

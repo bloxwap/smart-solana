@@ -173,6 +173,7 @@ bun run build
 bun run test:live
 bun run bench:live
 bun run bench:sustained
+bun run bench:failover
 ```
 
 The default tests are offline. `bun run test:live` makes real calls through the free mainnet registry. `bun run bench:live` compares the direct public Solana RPC with uncached and default pooled transports over rotating sequential and concurrent read phases. Set `BENCH_OUT=benchmark-results.json` to save the full report; `BENCH_SEQUENTIAL`, `BENCH_CONCURRENT`, and `BENCH_PACE_MS` adjust the workload.
