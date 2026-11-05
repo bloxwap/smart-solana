@@ -1,6 +1,6 @@
 {
   "name": "@bloxwap/smart-solana",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Adaptive, rate-limit-aware Solana JSON-RPC transport for @solana/kit and @solana/web3.js.",
   "license": "MIT",
   "type": "module",
