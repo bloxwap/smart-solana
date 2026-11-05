@@ -37,7 +37,7 @@
     },
     "packages/smart-solana": {
       "name": "@bloxwap/smart-solana",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "devDependencies": {
         "@solana/kit": "8.6.0",
         "@solana/web3.js": "^3.1.1",
