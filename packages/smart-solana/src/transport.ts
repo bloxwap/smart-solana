@@ -312,9 +312,10 @@ class RpcPool {
     if (this.closed) throw new Error("The Solana RPC transport is closed");
     if (options.signal?.aborted) throw abortError();
     const cacheable = this.options.cache !== false && !options.skipCache && isCacheableMethod(request.method);
-    const key = cacheKey(request.method, request.params);
+    let key: string | undefined;
 
     if (cacheable) {
+      key = cacheKey(request.method, request.params);
       const hit = this.cache.get(key);
       if (hit && !hit.stale) {
         this.emit({ type: "cacheHit", method: request.method });
@@ -328,22 +329,24 @@ class RpcPool {
 
     const canCoalesce = this.options.coalesce && isRetryableMethod(request.method, this.options.nonRetryableMethods);
     if (canCoalesce) {
-      let pending = this.inFlight.get(key);
+      key ??= cacheKey(request.method, request.params);
+      const coalesceKey = key;
+      let pending = this.inFlight.get(coalesceKey);
       if (!pending) {
-        pending = this.network(request, options.skipCache ?? false);
-        this.inFlight.set(key, pending);
+        pending = this.network(request, options.skipCache ?? false, undefined, coalesceKey);
+        this.inFlight.set(coalesceKey, pending);
         void pending.then(
           () => {
-            if (this.inFlight.get(key) === pending) this.inFlight.delete(key);
+            if (this.inFlight.get(coalesceKey) === pending) this.inFlight.delete(coalesceKey);
           },
           () => {
-            if (this.inFlight.get(key) === pending) this.inFlight.delete(key);
+            if (this.inFlight.get(coalesceKey) === pending) this.inFlight.delete(coalesceKey);
           },
         );
       }
       return cloneResponse(await abortable(pending, options.signal), request.id);
     }
-    return this.network(request, options.skipCache ?? false, options.signal);
+    return this.network(request, options.skipCache ?? false, options.signal, key);
   }
 
   snapshot(): PoolSnapshot {
@@ -412,7 +415,7 @@ class RpcPool {
     if (this.refreshing.has(key) || this.closed) return;
     this.refreshing.add(key);
     this.emit({ type: "cacheRefresh", method: request.method });
-    void this.network(request, false)
+    void this.network(request, false, undefined, key)
       .catch((error: unknown) => {
         this.emit({
           type: "backgroundError",
@@ -423,7 +426,12 @@ class RpcPool {
       .finally(() => this.refreshing.delete(key));
   }
 
-  private async network(request: JsonRpcRequest, skipCache: boolean, signal?: AbortSignal): Promise<JsonRpcResponse> {
+  private async network(
+    request: JsonRpcRequest,
+    skipCache: boolean,
+    signal?: AbortSignal,
+    key?: string,
+  ): Promise<JsonRpcResponse> {
     this.pendingRequests += 1;
     this.lastActivity = Date.now();
     this.startHealth();
@@ -433,7 +441,7 @@ class RpcPool {
       if (!skipCache && this.options.cache !== false && isCacheableMethod(request.method) && !response.error) {
         const ttl =
           this.options.cache.methodTtlMs[request.method] ?? defaultCacheTtl(request.method, this.options.cache.ttlMs);
-        this.cache.set(cacheKey(request.method, request.params), response, ttl);
+        this.cache.set(key ?? cacheKey(request.method, request.params), response, ttl);
       }
       return response;
     } finally {
