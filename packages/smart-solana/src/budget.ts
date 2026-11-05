@@ -48,6 +48,10 @@ export class TokenBucket {
 
   take(cost = 1): void {
     this.refill();
+    this.deduct(cost);
+  }
+
+  deduct(cost = 1): void {
     this.tokens -= cost;
   }
 }
@@ -85,8 +89,8 @@ export class RequestBudget {
       if (signal?.aborted) throw abortError();
       const delay = Math.max(this.global.delayMs(), methodBucket?.delayMs() ?? 0);
       if (delay <= 0) {
-        this.global.take();
-        methodBucket?.take();
+        this.global.deduct();
+        methodBucket?.deduct();
         return;
       }
       await sleep(Math.max(1, delay), signal);
