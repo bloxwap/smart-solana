@@ -175,6 +175,17 @@ describe("request efficiency", () => {
     expect(transport.snapshot().cacheEntries).toBe(1);
   });
 
+  it("does not build cache keys when caching and coalescing are disabled", async () => {
+    const fetch = (async () =>
+      new Response('{"jsonrpc":"2.0","id":1,"result":42}', {
+        headers: { "content-type": "application/json" },
+      })) as unknown as typeof globalThis.fetch;
+    const transport = make({ ...quietOptions, fetch, coalesce: false });
+    const stringify = vi.spyOn(JSON, "stringify");
+    await transport.request("getProgramAccounts", ["address"]);
+    expect(stringify).toHaveBeenCalledTimes(1);
+  });
+
   it("batches concurrent calls and maps out-of-order responses", async () => {
     const fetch = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       const payload = JSON.parse(String(init?.body)) as JsonRpcRequest[];
