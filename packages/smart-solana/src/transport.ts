@@ -573,20 +573,32 @@ class RpcPool {
 
   private selectEndpoint(method: string, excluded: ReadonlySet<string>): RuntimeEndpoint | undefined {
     const now = Date.now();
-    const eligible = this.endpoints.filter(
-      (endpoint) =>
-        !endpoint.quarantined &&
-        !endpoint.unsupportedMethods.has(method) &&
-        endpoint.cooldownUntil <= now &&
-        !excluded.has(endpoint.label),
-    );
-    if (eligible.length === 0) return undefined;
-    const sampled = eligible.filter((endpoint) => endpoint.global.samples > 0);
-    const candidates = sampled.length > 0 ? sampled : eligible;
-    return candidates.reduce((best, endpoint) => {
+    let best: RuntimeEndpoint | undefined;
+    let bestScore = Number.POSITIVE_INFINITY;
+    let hasSampled = false;
+    for (const endpoint of this.endpoints) {
+      if (
+        endpoint.quarantined ||
+        endpoint.unsupportedMethods.has(method) ||
+        endpoint.cooldownUntil > now ||
+        excluded.has(endpoint.label)
+      ) {
+        continue;
+      }
+      const sampled = endpoint.global.samples > 0;
+      if (hasSampled && !sampled) continue;
+      if (sampled && !hasSampled) {
+        hasSampled = true;
+        best = undefined;
+        bestScore = Number.POSITIVE_INFINITY;
+      }
       const score = this.score(endpoint, method);
-      return score < this.score(best, method) ? endpoint : best;
-    });
+      if (score < bestScore) {
+        best = endpoint;
+        bestScore = score;
+      }
+    }
+    return best;
   }
 
   private score(endpoint: RuntimeEndpoint, method: string): number {
